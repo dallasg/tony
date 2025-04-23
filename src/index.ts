@@ -26,6 +26,9 @@ import { loggerBehavior } from './core/behaviors/logger';
 import { GreetingService } from './services/GreetingService';
 import { GreetUserHandler } from './features/greet/GreetUserHandler';
 import { registerGreetEndpoint } from './features/greet/greet.endpoint';
+import { MathService } from './services/MathService';
+import { DoubleNumberHandler } from './features/math/DoubleNumberHandler';
+import { registerDoubleEndpoint } from './features/math/double.endpoint';
 
 export default {
   async fetch(req: Request): Promise<Response> {
@@ -43,6 +46,13 @@ export default {
     bus.use('LoggerBehavior');
 
     registerGreetEndpoint(router);
+
+    container.register('MathService', new MathService());
+    container.register('DoubleNumberHandler', new DoubleNumberHandler(container.resolve('MathService')));
+
+    bus.register('DoubleNumber', 'DoubleNumberHandler');
+
+    registerDoubleEndpoint(router);
 
     return router.handle(req, bus);
   }
